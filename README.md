@@ -1,4 +1,4 @@
-# Webserv Project @ 42 Porto
+# Webserv Project
 
 This project aims to develop a simple local HTTP server capable of hosting multiple ports, each with its own environment. We've dived into HTTP, TCP/IP (and its differences from UDP), and implemented the project using C++98. My focus was on ensuring smooth request/response behavior similar to real-life scenarios. Additionally, we explored CGI handling and various transfer-encoding scenarios.
 Throughout the project, we followed a simple Agile approach to our workflow, where I took on the role of both team leader and developer.
@@ -77,6 +77,8 @@ To test this functionality, open a second terminal and run the Python script fro
   - [Tiago Machado](https://github.com/snowhp)
   - [Tiago Pereira](https://github.com/t-pereira06)
   - [Rafael Soares](https://github.com/rafaSoares1)
+
+
 
 # Basics of HTTP Server
 
