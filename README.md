@@ -14,11 +14,11 @@ Throughout the project, we followed a simple Agile approach to our workflow, whe
   - [Creating a Valid HTTP Request](#creating-a-valid-http-request)
   - [Response](#response)
   - [Common HTTP Status Codes](#common-http-status-codes)
-  - [I/O Multiplexing](#i-o-multiplexing)
+- [I/O Multiplexing](#i-o-multiplexing)
   - [Select](#select)
   - [Poll](#poll)
   - [Epoll](#epoll)
-  - [Useful Links](#useful-links)
+- [Useful Links](#useful-links)
 
 ## Requirements and Configuration
 
