@@ -78,7 +78,7 @@ To test this functionality, open a second terminal and run the Python script fro
   - [Tiago Pereira](https://github.com/t-pereira06)
   - [Rafael Soares](https://github.com/rafaSoares1)
 
-
+<br><br>
 
 # Basics of HTTP Server
 
