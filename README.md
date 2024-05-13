@@ -163,13 +163,12 @@ Content-Length: 1024
 - `301 Moved Permanently` - The requested resource has been permanently moved to a new URL.
 
 
-----
 
-# I/O Multiplexing
+## I/O Multiplexing
 
 I/O Multiplexing is a technique used for managing multiple input/output operations over a single blocking system call. It's crucial for applications that need to handle multiple data streams simultaneously without dedicating a separate thread or process to each one, thus significantly improving efficiency and performance in networked applications.
 
-## `select()`
+### `select()`
 
 The `select()` system call allows a program to monitor multiple file descriptors to see if one or more of them are ready for an I/O operation (e.g., reading or writing).
 
@@ -185,7 +184,7 @@ The `select()` system call allows a program to monitor multiple file descriptors
 - Has a fixed limit on the number of descriptors (`FD_SETSIZE`).
 - Inefficient for large sets of descriptors due to its linear scanning mechanism.
 
-## `poll()`
+### `poll()`
 
 `poll()` serves a similar purpose to `select()`, monitoring multiple file descriptors, but it does so using an array of `struct pollfd` structures to overcome some of `select()`'s limitations.
 
@@ -197,7 +196,7 @@ The `select()` system call allows a program to monitor multiple file descriptors
 
 Unlike `select()`, `poll()` is more scalable and does not have a preset limit on the number of descriptors it can handle.
 
-## `epoll()`
+### `epoll()`
 
 Exclusive to Linux, `epoll()` is a modern alternative to `select()` and `poll()`, designed to efficiently handle a large number of file descriptors.
 
