@@ -3,6 +3,23 @@
 This project aims to develop a simple local HTTP server capable of hosting multiple ports, each with its own environment. We've dived into HTTP, TCP/IP (and its differences from UDP), and implemented the project using C++98. My focus was on ensuring smooth request/response behavior similar to real-life scenarios. Additionally, we explored CGI handling and various transfer-encoding scenarios.
 Throughout the project, we followed a simple Agile approach to our workflow, where I took on the role of both team leader and developer.
 
+- [Requirements and Configuration](#requirements-and-configuration)
+  - [Configuration File](#configuration-file)
+  - [Execution and Usage](#execution-and-usage)
+    - [CGI](#cgi)
+    - [Chunked Transfer Encoding](#chunked-transfer-encoding)
+- [Collaborators](#collaborators)
+- [Basics of HTTP Server](#basics-of-http-server)
+  - [Request-Response Cycle](#request-response-cycle)
+  - [Creating a Valid HTTP Request](#creating-a-valid-http-request)
+  - [Response](#response)
+  - [Common HTTP Status Codes](#common-http-status-codes)
+- [I/O Multiplexing](#i-o-multiplexing)
+  - [`select()`](#select)
+  - [`poll()`](#poll)
+  - [`epoll()`](#epoll)
+- [Useful Links](#useful-links)
+
 ## Requirements and Configuration
 
 Before running this project, ensure proper folder management and the presence of basic HTML default files, aswell that your machine has php-cgi and python3 installed. For detailed instructions, please refer to the ConfigReadme.md file.
@@ -53,6 +70,13 @@ To meet a requirement of the project, which mandates that chunked requests be un
 
 To test this functionality, open a second terminal and run the Python script from the command line.
 
+## Collaborators
+
+  - [Luís Pereira](https://github.com/lubuper)
+  - [José Pedro](https://github.com/ZPedro99)
+  - [Tiago Machado](https://github.com/snowhp)
+  - [Tiago Pereira](https://github.com/t-pereira06)
+  - [Rafael Soares](https://github.com/rafaSoares1)
 
 # Basics of HTTP Server
 
