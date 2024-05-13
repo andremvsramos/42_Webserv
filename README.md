@@ -15,9 +15,9 @@ Throughout the project, we followed a simple Agile approach to our workflow, whe
   - [Response](#response)
   - [Common HTTP Status Codes](#common-http-status-codes)
 - [I/O Multiplexing](#i-o-multiplexing)
-  - [`select()`](#select)
-  - [`poll()`](#poll)
-  - [`epoll()`](#epoll)
+  - [Select](#select)
+  - [Poll](#poll)
+  - [Epoll](#epoll)
 - [Useful Links](#useful-links)
 
 ## Requirements and Configuration
