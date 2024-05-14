@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: lde-sous <lde-sous@student.42porto.com>    +#+  +:+       +#+         #
+#    By: andvieir <andvieir@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/14 15:37:50 by lde-sous          #+#    #+#              #
-#    Updated: 2024/05/13 12:01:28 by lde-sous         ###   ########.fr        #
+#    Updated: 2024/05/14 15:50:36 by andvieir         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -103,6 +103,10 @@ pull-and-copy-files:
 
 clean:
 		@echo "$(RED)Cleaning logs...$(RESET)"
+		@if [ -f .dummy_file ]; then \
+			echo "$(RED)Removing .dummy_file...$(BLACK)"; \
+			$(RM) .dummy_file; \
+		fi
 		$(RM) $(LOGS_D)
 		@echo "$(GREENER)Done!$(RESET)"
 
@@ -114,6 +118,10 @@ fclean:
 		docker image rm lubuper/42_webserv_html:latest; \
 	else \
 		echo "$(YELLOW)No image found, skipping...$(RESET)"; \
+	fi
+	@if [ -f .dummy_file ]; then \
+		echo "$(RED)Removing .dummy_file...$(BLACK)"; \
+		$(RM) .dummy_file; \
 	fi
 	@$(RM) $(OBJ) $(NAME) $(OBJ_D) var
 	@echo "$(GREENER)Done!$(RESET)"
