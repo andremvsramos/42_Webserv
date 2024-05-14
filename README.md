@@ -84,6 +84,8 @@ Chunked Transfer Encoding is a mechanism used in HTTP to send data as a series o
 
 ##### Syntax
 
+In HTTP, chunked transfer encoding allows a request to be sent in chunks, primarily when the `Content-Length` header is not present or when the `Transfer-Encoding` header with the value `chunked` is included. The request body is divided into smaller "chunks," each prefixed by its size in hexadecimal format, followed by a carriage return and line feed (CRLF) pair, the chunk data, and another CRLF pair. The final chunk has a size of `0`, indicating the end of the request body. This mechanism enables sending requests with dynamic or streaming content without requiring the total size of the data to be known in advance.
+
 In a response, the use of chunked transfer encoding is indicated by the presence of the `Transfer-Encoding: chunked` header. Each chunk consists of the following components:
 
 1. **Chunk Size:** The size of the chunk in hexadecimal followed by a CRLF (Carriage Return + Line Feed).
@@ -92,29 +94,53 @@ In a response, the use of chunked transfer encoding is indicated by the presence
 
 The final chunk is a zero-length chunk, indicated by a chunk size of 0.
 
-Example of a response using chunked transfer encoding:
-  ```http
-  HTTP/1.1 200 OK
-  Content-Type: text/plain
-  Transfer-Encoding: chunked
+<table>
+  <tr>
+    <th>Chunked Response</th>
+    <th>Chunked Request</th>
+  </tr>
+  <tr>
+    <td>
+      <pre>
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Transfer-Encoding: chunked
 
-  4\r\n
-  Wiki\r\n
-  5\r\n
-  pedia\r\n
-  E\r\n
-   in\r\n\r\nchunks.\r\n
-  0\r\n
-  \r\n
-  ```
+4\r\n
+Wiki\r\n
+5\r\n
+pedia\r\n
+E\r\n
+in\r\n\r\nchunks.\r\n
+0\r\n
+\r\n
+      </pre>
+    </td>
+    <td>
+      <pre>
+POST /api/data HTTP/1.1
+Host: example.com
+Content-Type: text/plain
+Transfer-Encoding: chunked
+
+4\r\n
+data\r\n
+5\r\n
+chunk\r\n
+0\r\n
+\r\n
+      </pre>
+    </td>
+  </tr>
+</table>
 
 ##### Real-life Scenarios
 
-Chunked transfer encoding is commonly used in scenarios such as:
+Chunked transfer encoding finds application in various scenarios:
 
-- Streaming media: Videos or audio files may be transferred in chunks to begin playback before the entire file has been received.
-- Large file downloads: Content delivery networks (CDNs) and download managers often use chunked encoding to optimize download performance, especially for large files.
-- Dynamic content generation: When a web server generates a response dynamically, it may use chunked encoding to start sending data to the client as soon as it becomes available, without waiting for the entire response to be generated.
+- Streaming media: Videos or audio files may be transferred in chunks to initiate playback before the entire file is received.
+- Large file downloads: Content delivery networks (CDNs) and download managers often utilize chunked encoding to enhance download performance, particularly for large files.
+- Dynamic content generation: Web servers generating responses dynamically may employ chunked encoding to send data to the client as it becomes available, without waiting for the complete response to be generated.
 
 It's worth noting that while chunked responses are relatively common, chunked requests are much rarer in comparison. This is because most client-side software, such as web browsers, typically sends entire HTTP requests in one go rather than using chunked encoding. Chunked requests are generally reserved for specialized cases where the size of the request body is not known in advance or when the client needs to start sending data before it has received the entire request.
 
