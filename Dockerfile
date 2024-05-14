@@ -1,5 +1,10 @@
+# Use an appropriate base image
 FROM ubuntu:latest
 
-RUN apt update
+# Set the working directory
+WORKDIR .
 
-COPY ./var /usr/webserv/var
+RUN sudo apt update
+
+# Copy the current directory contents into the container at /app
+COPY /var /webserv/www/var

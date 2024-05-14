@@ -6,7 +6,7 @@
 #    By: andvieir <andvieir@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/14 15:37:50 by lde-sous          #+#    #+#              #
-#    Updated: 2024/05/14 15:50:36 by andvieir         ###   ########.fr        #
+#    Updated: 2024/05/14 16:42:42 by andvieir         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -57,10 +57,10 @@ RESET	=	$(shell tput sgr0)
 #----------DOCKER OPERATIONS----------#
 
 # Define the Docker image name (adjust as needed)
-DOCKER_IMAGE = lubuper/42_webserv_html:latest
+DOCKER_IMAGE = andremvsramos/webserv:latest
 
 # Define the path inside the container where files are located
-CONTAINER_VAR_PATH = /usr/webserv/var
+CONTAINER_VAR_PATH = /webserv/www/var
 
 # Define the local target directory
 LOCAL_VAR_PATH = .
@@ -112,10 +112,10 @@ clean:
 
 fclean:
 	@echo "$(RED)Uninstalling...$(RESET)"
-	@IMAGE_ID=$$(docker images -q lubuper/42_webserv_html:latest); \
+	@IMAGE_ID=$$(docker images -q andremvsramos/webserv:latest); \
 	if [ -n "$$IMAGE_ID" ]; then \
 		echo "$(RED)Image found, removing...$(BLACK)"; \
-		docker image rm lubuper/42_webserv_html:latest; \
+		docker image rm andremvsramos/webserv:latest; \
 	else \
 		echo "$(YELLOW)No image found, skipping...$(RESET)"; \
 	fi
