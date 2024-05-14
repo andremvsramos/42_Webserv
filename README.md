@@ -276,6 +276,8 @@ Content-Length: 1024
 
 I/O Multiplexing is a technique used for managing multiple input/output operations over a single blocking system call. It's crucial for applications that need to handle multiple data streams simultaneously without dedicating a separate thread or process to each one, thus significantly improving efficiency and performance in networked applications.
 
+We chose to use `epoll` for our project, but first, we need to understand each type of I/O multiplexing: `select`, `poll`, and `epoll`.
+
 ## `select()`
 
 The `select()` system call allows a program to monitor multiple file descriptors to see if one or more of them are ready for an I/O operation (e.g., reading or writing).
@@ -284,7 +286,7 @@ The `select()` system call allows a program to monitor multiple file descriptors
 
 1. Prepare three sets of file descriptors: read, write, and exceptions.
 2. Define a timeout duration.
-3. Invoke `select()`, which blocks until at least one descriptor becomes ready or a timeout happens.
+3. Invoke `select()`, which blocks until at least one descriptor becomes ready or a timeout occurs.
 4. After `select()` returns, check which descriptors are ready and proceed with the necessary operations.
 
 **Limitations:**
@@ -319,20 +321,21 @@ Exclusive to Linux, `epoll()` is a modern alternative to `select()` and `poll()`
 - Reduces CPU usage by eliminating the need to check all file descriptors.
 - Scales efficiently, capable of managing thousands of concurrent connections.
 
-In conclusion, while `select()` and `poll()` offer portability across Unix-like systems, `epoll()` provides superior performance and scalability on Linux systems, especially suitable for server applications that handle many simultaneous connections.
+In conclusion, while `select()` and `poll()` offer portability across Unix-like systems, `epoll()` provides superior performance and scalability on Linux systems, making it especially suitable for server applications that handle many simultaneous connections.
 
-We use our epoll group functions in our `StartServers()`. We create an `epoll_fd` variable that is the control structure for all the I/O operations that will be managed by epoll.
-The _nServ is the number of servers our cluster will have, and it is used as a parameter to determine the number of file descriptors that we need to handle.
+In our `StartServers()` function, we utilize our epoll group functions. We initialize an `epoll_fd` variable, serving as the control structure for all I/O operations managed by epoll. The `_nServ` parameter denotes the number of servers in our cluster, determining the quantity of file descriptors to handle.
 
-We now create a structure `epoll_event` with a buffer of 10, that is initialized to monitor both input (EPOLLIN) and output (EPOLLOUT) events. This will decide what type of activities on the sockets will be monitored - read/write.
+Now, we define a structure `epoll_event` with a buffer size of 10, initialized to monitor input (EPOLLIN) and output (EPOLLOUT) events. Additionally, we include hang-up (EPOLLHUP) and error (EPOLLERR) events. It's crucial to add these events to prevent unexpected errors, as epoll checks for them even if they're not explicitly added.
 
-`epoll_ctl(epoll_fd, EPOLL_CTL_ADD, events.data.fd, &events)` register the server's sockets and allows the server cluster to track events on these sockets.
+`epoll_ctl(epoll_fd, EPOLL_CTL_ADD, events.data.fd, &events)` registers the server's sockets, enabling the server cluster to monitor events on these sockets.
 
-`epoll_wait(epoll_fd, event_buffer, 10, 5000)` is called to wait for events on the monitored sockets. The function blocks until events are available, or the timeout (5000 milliseconds) occurs. If epoll_wait returns a negative value, it checks if a signal (gSignalStatus) has interrupted the wait. If the signal indicates a negative scenario, it simply returns from the method.
+`epoll_wait(epoll_fd, event_buffer, 10, 5000)` is called to wait for events on the monitored sockets. The function blocks until events are available, or the timeout (5000 milliseconds) occurs. If `epoll_wait` returns a negative value, it checks if a signal (`gSignalStatus`) has interrupted the wait, typically managed by SIGINT or Ctrl+C, which signifies the initiation of the shutdown procedure for the program.
 
-For each event detected, we check if the file descriptor from the event buffer belongs to a known server socket (indicating an incoming connection attempt). If it's a server socket, it accepts the new incoming connection using `accept(event_buffer[i].data.fd, (sockaddr*)&client_address, (socklen_t*)&addrlen)`, assigning it to a new client socket. The new client socket is then set to non-blocking mode and added to the epoll monitoring setup using `epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_socket, &event_buffer[i]) < 0)`.
+For each event detected, we check if the file descriptor from the event buffer belongs to a known server socket, indicating an incoming connection attempt. If it's a server socket, it accepts the new incoming connection using `accept(event_buffer[i].data.fd, (sockaddr*)&client_address, (socklen_t*)&addrlen)`, assigning it to a new client socket. The new client socket is then set to non-blocking mode and added to the epoll monitoring setup using `epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_socket, &event_buffer[i]) < 0)`.
 
-If an existing connection has new data to read (EPOLLIN event), the connection is handled by a method called connectionHandler that sets the connection and sends the request. If `checkSocketActivity()` closes a fd we break the cycle and go back to the beginning, so as not to iterate over possible removed FDs from buffer.  might be called to perform periodic maintenance, such as removing inactive sockets from the epoll.
+If an existing connection has new data to read (EPOLLIN event), the connection is handled by a method called `connectionHandler()`, which processes the connection and sends the request. EPOLLIN typically indicates incoming data (the request), while EPOLLOUT usually signifies that the socket is ready to send data (the response). If `checkSocketActivity()` closes a file descriptor, we break the cycle and return to the beginning to avoid iterating over possibly removed file descriptors from the buffer. This method may also be called to perform periodic maintenance, such as removing inactive sockets from epoll.
+
+We only add a new connection file descriptor if it does not exist previously. If it already exists, we use the existing one. This ensures that, for example, a request needing to fetch an HTML page and its favicon or an image, won't create new connections for both but will use the same one. This approach also works for chunked requests.
 
 # Useful links:
 
