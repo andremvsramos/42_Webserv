@@ -787,7 +787,6 @@ int	Server::sender(int socket) {
 	// Creating shortcuts for objects to avoid continuous memory accessing
 	Connection cnt = getConnection(socket);
 	int fd = cnt.getConnectionFD();
-//	std::cout << "sender with fd: " << fd << std::endl;
 	usleep(10);
 	Request& req = cnt.getConnectionRequest();
 	Response& resp = cnt.getConnectionResponse();
