@@ -297,7 +297,7 @@ For each event detected, we check if the file descriptor from the event buffer b
 
 If an existing connection has new data to read (EPOLLIN event), the connection is handled by a method called connectionHandler that sets the connection and sends the request. If `checkSocketActivity()` closes a fd we break the cycle and go back to the beginning, so as not to iterate over possible removed FDs from buffer.  might be called to perform periodic maintenance, such as removing inactive sockets from the epoll.
 
-# Usefull links:
+# Useful links:
 
 <details>
 <summary>Introductory Videos</summary>
