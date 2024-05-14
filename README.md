@@ -3,6 +3,9 @@
 This project aims to develop a simple local HTTP server capable of hosting multiple ports, each with its own environment. We've dived into HTTP, TCP/IP (and its differences from UDP), and implemented the project using C++98. My focus was on ensuring smooth request/response behavior similar to real-life scenarios. Additionally, we explored CGI handling and various transfer-encoding scenarios.
 Throughout the project, we followed a simple Agile approach to our workflow, where I took on the role of both team leader and developer.
 
+<details>
+<summary><h2>Table Of Contents</h2></summary>
+	
 - [Requirements and Configuration](#requirements-and-configuration)
   - [Configuration File](#configuration-file)
   - [Execution and Usage](#execution-and-usage)
@@ -24,6 +27,8 @@ Throughout the project, we followed a simple Agile approach to our workflow, whe
   - [Poll](#poll)
   - [Epoll](#epoll)
 - [Useful Links](#useful-links)
+
+</details>
 
 ## Requirements and Configuration
 
