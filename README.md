@@ -8,14 +8,18 @@ Throughout the project, we followed a simple Agile approach to our workflow, whe
   - [Execution and Usage](#execution-and-usage)
     - [CGI](#cgi)
     - [Chunked Transfer Encoding](#chunked-transfer-encoding)
+      - [Syntax](#syntax)
+      - [Real-life Scenarios](#real-life-scenarios)
+      - [Project Application](#project-application)
 - [Logs](#logs)
 - [Collaborators](#collaborators)
 - [Basics of HTTP Server](#basics-of-http-server)
+  - [TCP and UDP](#tcp-and-udp)
   - [Request-Response Cycle](#request-response-cycle)
   - [Creating a Valid HTTP Request](#creating-a-valid-http-request)
   - [Response](#response)
   - [Common HTTP Status Codes](#common-http-status-codes)
-- [I/O Multiplexing](#i-o-multiplexing)
+- [IO Multiplexing](#io-multiplexing)
   - [Select](#select)
   - [Poll](#poll)
   - [Epoll](#epoll)
@@ -71,6 +75,46 @@ If you have questions about CGI, please visit the [RFC 3875 documentation](https
 
 #### Chunked Transfer Encoding
 
+Chunked Transfer Encoding is a mechanism used in HTTP to send data as a series of chunks, instead of in a single block. This allows the server to start sending the response before it knows the total size, which is particularly useful when the size of the response is not known in advance or when the response is being generated dynamically.
+
+##### Syntax
+
+In a response, the use of chunked transfer encoding is indicated by the presence of the `Transfer-Encoding: chunked` header. Each chunk consists of the following components:
+
+1. **Chunk Size:** The size of the chunk in hexadecimal followed by a CRLF (Carriage Return + Line Feed).
+2. **Chunk Data:** The actual chunk data.
+3. **Chunk Terminator:** A CRLF that marks the end of the chunk.
+
+The final chunk is a zero-length chunk, indicated by a chunk size of 0.
+
+Example of a response using chunked transfer encoding:
+  ```http
+  HTTP/1.1 200 OK
+  Content-Type: text/plain
+  Transfer-Encoding: chunked
+
+  4\r\n
+  Wiki\r\n
+  5\r\n
+  pedia\r\n
+  E\r\n
+   in\r\n\r\nchunks.\r\n
+  0\r\n
+  \r\n
+  ```
+
+##### Real-life Scenarios
+
+Chunked transfer encoding is commonly used in scenarios such as:
+
+- Streaming media: Videos or audio files may be transferred in chunks to begin playback before the entire file has been received.
+- Large file downloads: Content delivery networks (CDNs) and download managers often use chunked encoding to optimize download performance, especially for large files.
+- Dynamic content generation: When a web server generates a response dynamically, it may use chunked encoding to start sending data to the client as soon as it becomes available, without waiting for the entire response to be generated.
+
+It's worth noting that while chunked responses are relatively common, chunked requests are much rarer in comparison. This is because most client-side software, such as web browsers, typically sends entire HTTP requests in one go rather than using chunked encoding. Chunked requests are generally reserved for specialized cases where the size of the request body is not known in advance or when the client needs to start sending data before it has received the entire request.
+
+##### Project Application
+
 For this project, we extensively discussed Chunked Transfer Encoding (CTE). There was debate about its availability in base NGINX, which HTTP version supports it, and in what form. Multiple sources claim that CTE is available in HTTP/1.1, but only for chunked responses (which we don't generate in our project), while others imply it's available for both responses and requests. Some references suggest that although HTTP/1.1 allows it, base NGINX doesn't and requires additional modules to be installed.  Or you can disable CTE handling directly on a NGINX configuration file. Additionally, some results indicate that when HTTP/1.1 receives a chunked request, it forwards it to HTTP/1.0 to handle unexpected behavior.
 
 To meet a requirement of the project, which mandates that chunked requests be unchunked and decoded, we've provided a Python script (`chunker.py`) to generate chunked requests. We couldn't find a way to generate them locally using a browser, hence the need for the script. We've implemented a simple handler that, upon receiving a chunked request, waits until the full request is received, decodes the hexadecimal values, and sends a simple `200 OK` response to the script. This is a hardcoded example serving as a proof of concept since we rarely encounter chunked requests in normal scenarios.
@@ -98,6 +142,16 @@ make valgrind CONFIG_FILE=<configuration file>
 # Basics of HTTP Server
 
 HTTP (Hypertext Transfer Protocol) is the cornerstone protocol used for exchanging information over the internet, serving as the foundation of the World Wide Web. It enables communication between web browsers and servers, facilitating both server-side and client-side programming.
+
+## TCP and UDP
+
+Before delving into HTTP, it's essential to understand the underlying transport protocols: TCP/IP and UDP.
+
+- **TCP/IP (Transmission Control Protocol/Internet Protocol):** TCP/IP is a reliable, connection-oriented protocol suite that provides error checking and guarantees the delivery of data packets in the correct order. It establishes a connection between the client and server before transferring data and ensures that packets arrive intact and in sequence. TCP/IP is commonly used for applications that require high reliability, such as web browsing, email, and file transfer.
+
+- **UDP (User Datagram Protocol):** UDP is a lightweight, connectionless protocol that operates without establishing a connection between the client and server. Unlike TCP/IP, UDP does not provide error checking, packet sequencing, or guaranteed delivery of data packets. Instead, it offers low-latency communication, making it suitable for real-time applications like online gaming, video streaming, and VoIP (Voice over Internet Protocol).
+
+Understanding the differences between TCP/IP and UDP is crucial for designing and implementing efficient network applications, including HTTP servers.
 
 ## Request-Response Cycle
 
@@ -181,11 +235,11 @@ Content-Length: 1024
 
 
 
-## I/O Multiplexing
+# IO Multiplexing
 
 I/O Multiplexing is a technique used for managing multiple input/output operations over a single blocking system call. It's crucial for applications that need to handle multiple data streams simultaneously without dedicating a separate thread or process to each one, thus significantly improving efficiency and performance in networked applications.
 
-### `select()`
+## `select()`
 
 The `select()` system call allows a program to monitor multiple file descriptors to see if one or more of them are ready for an I/O operation (e.g., reading or writing).
 
@@ -201,7 +255,7 @@ The `select()` system call allows a program to monitor multiple file descriptors
 - Has a fixed limit on the number of descriptors (`FD_SETSIZE`).
 - Inefficient for large sets of descriptors due to its linear scanning mechanism.
 
-### `poll()`
+## `poll()`
 
 `poll()` serves a similar purpose to `select()`, monitoring multiple file descriptors, but it does so using an array of `struct pollfd` structures to overcome some of `select()`'s limitations.
 
@@ -213,7 +267,7 @@ The `select()` system call allows a program to monitor multiple file descriptors
 
 Unlike `select()`, `poll()` is more scalable and does not have a preset limit on the number of descriptors it can handle.
 
-### `epoll()`
+## `epoll()`
 
 Exclusive to Linux, `epoll()` is a modern alternative to `select()` and `poll()`, designed to efficiently handle a large number of file descriptors.
 
@@ -243,9 +297,7 @@ For each event detected, we check if the file descriptor from the event buffer b
 
 If an existing connection has new data to read (EPOLLIN event), the connection is handled by a method called connectionHandler that sets the connection and sends the request. If `checkSocketActivity()` closes a fd we break the cycle and go back to the beginning, so as not to iterate over possible removed FDs from buffer.  might be called to perform periodic maintenance, such as removing inactive sockets from the epoll.
 
-
-
-## Usefull links:
+# Usefull links:
 
 <details>
 <summary>Introductory Videos</summary>
