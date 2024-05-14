@@ -15,7 +15,6 @@ Throughout the project, we followed a simple Agile approach to our workflow, whe
       - [Real-life Scenarios](#real-life-scenarios)
       - [Project Application](#project-application)
 - [Logs](#logs)
-- [Collaborators](#collaborators)
 - [Basics of HTTP Server](#basics-of-http-server)
   - [TCP and UDP](#tcp-and-udp)
   - [Request-Response Cycle](#request-response-cycle)
@@ -27,6 +26,7 @@ Throughout the project, we followed a simple Agile approach to our workflow, whe
   - [Poll](#poll)
   - [Epoll](#epoll)
 - [Useful Links](#useful-links)
+- [Collaborators](#collaborators)
 
 </details>
 
@@ -165,14 +165,6 @@ To help you track server block configurations, incoming requests, and Valgrind o
 ```bash
 make valgrind CONFIG_FILE=<configuration file>
 ```
-
-## Collaborators
-
-  - [Luís Pereira](https://github.com/lubuper)
-  - [José Pedro](https://github.com/ZPedro99)
-  - [Tiago Machado](https://github.com/snowhp)
-  - [Tiago Pereira](https://github.com/t-pereira06)
-  - [Rafael Soares](https://github.com/rafaSoares1)
 
 <br><br>
 
@@ -430,3 +422,11 @@ We only add a new connection file descriptor if it does not exist previously. If
 
 - [web.notaduo.com/notes/29srs/edit](https://web.notaduo.com/notes/29srs/edit)
 </details>
+
+# Collaborators
+
+  - [Luís Pereira](https://github.com/lubuper)
+  - [José Pedro](https://github.com/ZPedro99)
+  - [Tiago Machado](https://github.com/snowhp)
+  - [Tiago Pereira](https://github.com/t-pereira06)
+  - [Rafael Soares](https://github.com/rafaSoares1)
