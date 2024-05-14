@@ -101,7 +101,6 @@ Server* ServerCluster::getServer(int fd) {
  * After setting up all servers, it establishes server sockets, configures poll file descriptors, and displays server information.
  */
 void	ServerCluster::SetupServers() {
-	DisplayBogeyDocker();
 	t_listen listenStruct;
 	int i = 0;
 	std::cout << BOLD << GREEN << "─────────────────────────[Parsing " << _config.getServerBlocks().size() << " server(s)]──────────────────────────" << RESET << std::endl;
@@ -360,7 +359,6 @@ void	ServerCluster::StartServers() {
 					return ; //check favicon < 0
 				throw ServerClusterException("EPOLL_WAIT Failed");
 			}
-
 			// Create a buffer for each server socket that manages events
 			for (int i = 0; i < numEvents; i++) {
 
@@ -441,10 +439,14 @@ void	ServerCluster::connectionHandler(int fd, Server* server) {
 
 	// Initialize and update activity time for each connection
 	_lastActivityTime[fd] = time(NULL);
+
+	std::cout << CYAN << "\n[Request for server " << server->getConf().server_name.back() << ":" << server->getListen().port << " received]" << RESET << std::endl;
 	if (std::find_if(server->getConnectionVector().begin(), server->getConnectionVector().end(), MatchFd(fd)) == server->getConnectionVector().end()) {
 		server->setConnection(fd);
+		std::cout << CYAN << "[New connection added]" << RESET << std::endl;
 	}
 	server->sender(fd);
+	std::cout << GREEN << "[Response sent]" << RESET << std::endl;
 }
 
 

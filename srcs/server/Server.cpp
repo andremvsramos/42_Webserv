@@ -695,11 +695,12 @@ void	Server::executeCGIScript(const std::string& scriptPath, Request& req, int f
 		envp[16] = const_cast<char*>(_envp.server_software.c_str());
 		envp[17] = NULL;
 
-	// Command to execute Python script
-	char* argv[] = {const_cast<char*>("/usr/bin/python3"), const_cast<char*>(scriptPath.c_str()), NULL};
+		// Command to execute Python script
+		char* argv[] = {const_cast<char*>("/usr/bin/python3"), const_cast<char*>(scriptPath.c_str()), NULL};
 
-	if (execve("/usr/bin/python3", argv, envp) == -1)
-		exit(EXIT_FAILURE);
+		if (execve("/usr/bin/python3", argv, envp) == -1)
+			exit(EXIT_FAILURE);
+	}
 
 	else if (pid > 0) {
 
@@ -750,7 +751,7 @@ void	Server::executePost(Request& req) {
     file << req.getReqbody();
 	file << "---------------------------" << std::endl;
     file.close();
-	std::cout << "Comment added successfully" << std::endl;
+	std::cout << GREEN << "[Comment added successfully]" << RESET << std::endl;
 }
 
 /**
@@ -762,9 +763,9 @@ void	Server::executePost(Request& req) {
 void	Server::executeDeleteFile() {
 	const char* filename = "comments.txt";
 	if(remove(filename) == 0)
-		std::cout << "File " << filename << " deleted successfully." << std::endl;
+		std::cout << GREEN << "[File " << filename << " deleted successfully]" << RESET << std::endl;
 	else
-		std::cout << "Error deleting file" << std::endl;
+		std::cout << RED << "[Error deleting file]" << RESET << std::endl;
 }
 
 /* ===================== Server HTTP I/O Functions ===================== */
@@ -802,11 +803,15 @@ int	Server::sender(int socket) {
 		}
 		return 0;
 	}
+
+
 	// Check request size
 	reqCode = req.checkClientSize(this);
 	if (reqCode != 413) {
 		// Parse the request URI, METHOD and HTTP VERSION. Returns appropriate response codes
 		reqCode = req.parseRequest(this);
+
+		std::cout << YELLOW << "[Requesting " << req.getReqUri() << " via " << req.getReqMethod() << "]" << RESET << std::endl;
 
 		std::string host(req.getReqHost());
 		std::size_t pos = host.find(':');

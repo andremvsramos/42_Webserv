@@ -53,8 +53,14 @@ extern "C" void	signalHandler(int signum) {
     std::cout << std::endl;
 }
 
-void printWebServLogo() {
-
+static void printWebServLogo(char** envp) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        char* argv[] = {NULL};
+        if (execve("/usr/bin/clear", argv, envp) == -1)
+            exit (EXIT_FAILURE);
+    }
+    waitpid(pid, NULL, 0);
     std::cout << BOLD << CYAN << " /██      /██ /████████ /███████   /██████  /████████ /███████  /██    /██\n";
     std::cout << "| ██  /█ | ██| ██_____/| ██__  ██ /██__  ██| ██_____/| ██__  ██| ██   | ██\n";
     std::cout << "| ██ /███| ██| ██      | ██  \\ ██| ██  \\__/| ██      | ██  \\ ██| ██   | ██\n";
@@ -65,9 +71,9 @@ void printWebServLogo() {
     std::cout << "|__/     \\__/|________/|_______/  \\______/ |________/|__/  |__/    \\_/    \n" << RESET << std::endl;
 }
 
-int		main(int ac, char **av)
+int		main(int ac, char **av, char** envp)
 {
-    printWebServLogo();
+    printWebServLogo(envp);
     std::string filename;
     signal(SIGPIPE, SIG_IGN);
     if (ac != 2)

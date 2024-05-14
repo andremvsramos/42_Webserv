@@ -100,7 +100,7 @@ int		Request::fillRequestHeader(int socket) {
 			chunky = true;
 	}
 	if (!_fullRequest.empty()) {
-			parseFullRequest();
+		parseFullRequest();
 		if (chunky) {
 			gFullRequest.append(_fullRequest);
 			return 1;
@@ -479,7 +479,7 @@ int	Request::parseRequest(Server* server) {
 		if (!validateRequestMethod(server))
 			return 405;
 	} catch (std::exception &e) {
-		std::cerr << "Cant Parse Request" << std::endl;
+		std::cerr << RED << "\nError: Can't Parse Request" << RESET << std::endl;
 	}
 
 	// If we reach this point then everything should be ok and we return default '200 OK' response

@@ -51,7 +51,6 @@ class	ServerCluster {
 		void	ParseServer(Server* server);
 		void	CreateNewServer(t_listen& listenStruct);
 		void	SetupServerSockets();
-		void	DisplayBogeyDocker();
 		void	DisplayServerInfo();
 		void	ClearServer();
 
