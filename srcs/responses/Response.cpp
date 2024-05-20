@@ -322,7 +322,7 @@ int	Response::generateListingFile(Server* server, int fd, std::string location) 
 	// Remove the temp file
 	if (std::remove(path.c_str()) != 0) {
         // Handle error if unable to delete file
-        std::cerr << "Error: Unable to delete file " << path << std::endl;
+        std::cerr << RED << "Error: Unable to delete file " << path << RESET << std::endl;
     }
 
 	return nFiles;

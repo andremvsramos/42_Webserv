@@ -127,7 +127,7 @@ int createListHTML(std::string location, std::ofstream& file) {
         closedir(dir);
     } else {
         // Error handling if unable to open directory
-        std::cerr << "Error: Unable to open directory " << location << std::endl;
+        std::cerr << RED << "Error: Unable to open directory " << location << RESET << std::endl;
         return -1;
     }
 

@@ -510,7 +510,7 @@ void Server::executeDeleteCGIScript(const std::string& scriptPath, Request& req,
 	pid_t pid = fork();  // Create a new process
     if (pid == -1) {
         // Fork failed
-        std::cerr << "Failed to fork." << std::endl;
+        std::cerr << RED << "[Failed to fork]" << RESET << std::endl;
     } else if (pid > 0) {
         // Parent process
         int status;
@@ -732,7 +732,7 @@ void	Server::executePost(Request& req) {
 	if(!infile.good()) {
 		std::ofstream outfile("comments.txt");
         if (!outfile.is_open()) {
-            std::cerr << "Error creating file!\n";
+            std::cerr << RED << "[Error creating file]" <<RESET << std::endl;
             return;
         }
 		outfile.close();
@@ -740,7 +740,7 @@ void	Server::executePost(Request& req) {
 
 	std::ofstream file("comments.txt", std::ios_base::app);
     if (!file.is_open()) {
-        std::cerr << "Error opening file!\n";
+        std::cerr << RED << "[Error opening file]" << RESET << std::endl;
         return;
     }
     // Write new data to the file

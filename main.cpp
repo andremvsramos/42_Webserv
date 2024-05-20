@@ -77,7 +77,7 @@ int		main(int ac, char **av, char** envp)
     std::string filename;
     signal(SIGPIPE, SIG_IGN);
     if (ac != 2)
-        std::cerr << "Run the program with a configuration file: ./webserv [configuration file]" << std::endl;
+        std::cerr << RED << "Run the program with a configuration file: ./webserv [configuration file]" << RESET << std::endl;
     else {
         signal(SIGINT, signalHandler);
         ServerCluster cluster(av[1]);

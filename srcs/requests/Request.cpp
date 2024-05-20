@@ -79,10 +79,10 @@ int		Request::fillRequestHeader(int socket) {
 			size_t len = pos - buffer;
 
 			// This cast prevents basic_string::append error, in case buffer isn't correctly formatted
-			_firstLineRequest.append(static_cast<std::string>(buffer).substr(0, len));
+			_firstLineRequest.append(buffer, len);
 			firstLine = true;
 		}
-		_fullRequest.append(static_cast<std::string>(buffer));
+		_fullRequest.append(buffer, bytesRead);
 
 		// End case for the last chunk in a chunked request
 		if (chunky && strstr(_fullRequest.c_str(), "\r\n0\r\n\r\n")) {
@@ -295,13 +295,13 @@ std::string Request::extractBody() {
 		// Find the end of the "Content-Type: text/plain" line
 		startPos = _fullRequest.find("\r\n\r\n", startPos);
 		if (startPos == std::string::npos) {
-			std::cerr << "Start of content not found." << std::endl;
+			std::cerr << RED << "[Start of content not found]" << RESET << std::endl;
 			return "";
 		}
 		startPos += 4;
 		std::string::size_type endPos = _fullRequest.find(finalBoundary, startPos);
 		if (endPos == std::string::npos) {
-			std::cerr << "Final boundary marker not found." << std::endl;
+			std::cerr << RED << "[Final boundary marker not found]" << RESET << std::endl;
 			return "";
 		}
 		body = _fullRequest.substr(startPos, endPos - startPos);
