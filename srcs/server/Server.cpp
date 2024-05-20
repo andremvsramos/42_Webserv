@@ -270,10 +270,9 @@ int	Server::testCGI_POST(const std::string& uri, int fd, Request& req, Response&
 			return reqCode;
 		}
 		std::string contentlen(req.getHeaderValue("Content-Length"));
-		std::cout << "CONTENT BODY - > " << contentlen << std::endl;
 		fillCGIEnvPOST(_svConf, uri, _envp, req);
 		if (std::atoi(contentlen.c_str()) == 0) {
-			std::cout << "No content was sent" << std::endl;
+			std::cout << RED << "[No content was sent]" << RESET << std::endl;
 			reqCode = 204;
 		}
 		else {
@@ -292,7 +291,6 @@ int	Server::testCGI_POST(const std::string& uri, int fd, Request& req, Response&
 				// Check if the file is the same type as uri
 				if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos) {
 					std::string method = _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1);
-					std::cout << "METHOD -> " <<  method << std::endl;
 					if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end()) {
 						executeCGIScript("." + file->cgi_pass, req, fd,	resp);
 						_isCGI = true;
@@ -318,9 +316,7 @@ int	Server::testCGI_POST(const std::string& uri, int fd, Request& req, Response&
 
 							// Check if the file is the same type as uri
 							if (file && (file->name.find(fileExt) != std::string::npos) && file->cgi_pass.find(uri) != std::string::npos) {
-								std::cout << "cgi needs to be: " << file->cgi_pass << std::endl;
 								std::string method = _envp.request_method.substr(_envp.request_method.find_first_of('=') + 1);
-								std::cout << "METHOD -> " <<  method << std::endl;
 								if (std::find(file->allow_methods.begin(), file->allow_methods.end(), method) != file->allow_methods.end()) {
 									executeCGIScript("." + file->cgi_pass, req, fd,	resp);
 									_isCGI = true;
