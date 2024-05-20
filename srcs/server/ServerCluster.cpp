@@ -275,7 +275,9 @@ int ServerCluster::checkSocketActivity(int epoll_fd, struct epoll_event* event_b
 /* ===================== Config Parser Caller Functions ===================== */
 
 
-void	ServerCluster::config(std::string file_path) {}
+void	ServerCluster::config(std::string file_path) {
+	(void)file_path;
+}
 
 void	ServerCluster::verifySemiColon(Server* server) {
 	_config.parseSemicolon(server->getMutableBody());
