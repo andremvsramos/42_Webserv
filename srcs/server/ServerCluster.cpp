@@ -275,9 +275,7 @@ int ServerCluster::checkSocketActivity(int epoll_fd, struct epoll_event* event_b
 /* ===================== Config Parser Caller Functions ===================== */
 
 
-void	ServerCluster::config(std::string file_path) {
-	std::cout << file_path << std::endl;
-}
+void	ServerCluster::config(std::string file_path) {}
 
 void	ServerCluster::verifySemiColon(Server* server) {
 	_config.parseSemicolon(server->getMutableBody());
@@ -365,12 +363,12 @@ void	ServerCluster::StartServers() {
 				// First N times, client socket will be each servers base socket
 				int client_socket = event_buffer[i].data.fd;
 				if(event_buffer[i].events & EPOLLERR) {
-					std::cerr << "EPOLLERR event on fd " << client_socket << std::endl;
+					std::cerr << RED << "[EPOLLERR EVENT FD " << client_socket << "]" << RESET << std::endl;
 					close(event_buffer[i].data.fd);
 					continue;
 				}
 				else if(event_buffer[i].events & EPOLLHUP) {
-					std::cerr << "EPOLLHUP event on fd " << client_socket << std::endl;
+					std::cerr << RED << "[EPOLLHUP EVENT FD " << client_socket << "]" << RESET << std::endl;
 					close(event_buffer[i].data.fd);
 					continue;
 				}
