@@ -19,7 +19,7 @@ bool firstChunk = true;
 /* ===================== Orthodox Canonical Form ===================== */
 
 Request::Request() : _method(""), _uri(""), _httpVersion(""),
-_firstLineRequest(""), _fullRequest(""), _isChunked(false), _isRequestComplete(false) {}
+_firstLineRequest(""), _fullRequest(""), _pageNotFound(false), _isChunked(false), _isRequestComplete(false)  {}
 
 Request::Request(const Request& original) {
 	_method = original._method;
@@ -29,6 +29,7 @@ Request::Request(const Request& original) {
 	_fullRequest = original._fullRequest;
 	_isChunked = original._isChunked;
 	_isRequestComplete = original._isRequestComplete;
+	_pageNotFound = original._pageNotFound;
 }
 
 Request& Request::operator=(const Request& original) {
@@ -40,6 +41,7 @@ Request& Request::operator=(const Request& original) {
 		_fullRequest = original._fullRequest;
 		_isChunked = original._isChunked;
 		_isRequestComplete = original._isRequestComplete;
+		_pageNotFound = original._pageNotFound;
 	}
 	return *this;
 }
@@ -332,7 +334,7 @@ bool Request::validateRequestMethod(Server* server) {
 
 	// Check root methods if no locations are defined
 	if (server->getConf().locationStruct.empty()) {
-		if (currentURI == "root" || _uri == "/") {
+		if (_uri == "/") {
 			if ((_method == "GET" && server->isGETAllowed()) ||
 				(_method == "POST" && server->isPOSTAllowed()) ||
 				(_method == "DELETE" && server->isDELETEAllowed())) {
@@ -340,6 +342,15 @@ bool Request::validateRequestMethod(Server* server) {
 			}
 			return false;
 		}
+	}
+
+	if (_uri == "/") {
+		if ((_method == "GET" && server->isGETAllowed()) ||
+			(_method == "POST" && server->isPOSTAllowed()) ||
+			(_method == "DELETE" && server->isDELETEAllowed())) {
+			return true;
+		}
+		return false;
 	}
 
 	// Iterate through each location in the server
@@ -355,6 +366,8 @@ bool Request::validateRequestMethod(Server* server) {
 					(_method == "DELETE" && std::find(dir->allow_methods.begin(), dir->allow_methods.end(), "DELETE") != dir->allow_methods.end())) {
 					return true;
 				}
+				else
+					return false;
 			}
 			else if(dir) {
 				std::vector<LocationFiles*>::iterator file_it = dir->files.begin();
@@ -374,6 +387,8 @@ bool Request::validateRequestMethod(Server* server) {
 							(_method == "DELETE" && std::find(file->allow_methods.begin(), file->allow_methods.end(), "DELETE") != file->allow_methods.end())) {
 							return true;
 						}
+						else
+							return false;
 					}
 				}
 			} // check file vector within directory before checking file on root
@@ -393,6 +408,8 @@ bool Request::validateRequestMethod(Server* server) {
 						(_method == "DELETE" && std::find(file->allow_methods.begin(), file->allow_methods.end(), "DELETE") != file->allow_methods.end())) {
 						return true;
 					}
+					else
+						return false;
 				}
 				else
 					currentURI = "root";
@@ -405,11 +422,29 @@ bool Request::validateRequestMethod(Server* server) {
 					(_method == "DELETE" && server->isDELETEAllowed())) {
 					return true;
 				}
+				else
+					return false;
 			}
 		} catch(std::bad_cast &e) {
 			std::cout << "Failed Casting on Request::validateRequestMethod" << std::endl;
 		}
 	}
+
+	for (it = server->getConf().locationStruct.begin(); it != server->getConf().locationStruct.end(); ++it) {
+		LocationDir* dir = dynamic_cast<LocationDir*>(*it);
+		if (dir) {
+			if (_uri.find(dir->name) != std::string::npos)
+				return true;
+		} else {
+			LocationFiles* files = dynamic_cast<LocationFiles*>(*it);
+			if (files) {
+				if (_uri.find(files->name) != std::string::npos)
+					return true;
+			}
+		}
+	}
+
+	_pageNotFound = true;
 	return false;
 }
 
@@ -476,8 +511,11 @@ int	Request::parseRequest(Server* server) {
 			if (code != 0)
 				return code;
 		}
-		if (!validateRequestMethod(server))
+		if (!validateRequestMethod(server)) {
+			if (_pageNotFound)
+				return 404;
 			return 405;
+		}
 	} catch (std::exception &e) {
 		std::cerr << RED << "\nError: Can't Parse Request" << RESET << std::endl;
 	}

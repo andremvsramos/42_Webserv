@@ -21,7 +21,7 @@ class Server;
 
 class Request {
 
-	private:		
+	private:
 		std::string _method;
 		std::string _uri;
 		std::string _httpVersion;
@@ -35,6 +35,7 @@ class Request {
 		std::string _contentLength;
 		std::string _filename;
 		std::string _host;
+		bool		_pageNotFound;
 
 
 	public:
@@ -73,7 +74,7 @@ class Request {
 		void	RequestLogger(std::string request);
 		int		checkClientSize(Server* server);
 		double		getContentLength();
-		
+
 		class RequestFileException : public std::exception {
 			private:
 				std::string _errorMsg;
