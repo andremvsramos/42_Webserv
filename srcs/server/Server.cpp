@@ -915,16 +915,16 @@ int	Server::sender(int socket) {
 	else {
 			if ((_svConf.indexFile.empty() && !resp.getRedirectFlag()) || path == "404" || path == "400") {
 
-			// Check path if path is a Bad Request, if not default to Page Not Found
-			if (path == "400") {
-				resp.sendResponse(this, fd, resp.getErrorPage(400, getConf()), 400);
+				// Check path if path is a Bad Request, if not default to Page Not Found
+				if (path == "400" || path == "404") {
+					resp.sendResponse(this, fd, resp.getErrorPage(atoi(path.c_str()), getConf()), atoi(path.c_str()));
+				}
+				else {
+					resp.sendResponse(this, fd, resp.getErrorPage(200, getConf()), 200);
+				}
 			}
-			else {
-				resp.sendResponse(this, fd, resp.getErrorPage(404, getConf()), 404);
-			}
-		}
-		else
-			resp.sendResponse(this, fd, (path + _svConf.indexFile), reqCode);
+			else
+				resp.sendResponse(this, fd, (path + _svConf.indexFile), reqCode);
 	}
 	// If indexes were added via dir listing, remove them so we can access the list again recursively in the browser
 	if (wasListed)

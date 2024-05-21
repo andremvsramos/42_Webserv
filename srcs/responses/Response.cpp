@@ -222,6 +222,9 @@ std::string	Response::selectIndexFile(Server* server, int fd, const StringVector
 	std::string newroot;
 	std::string locationRoot;
 
+	if (_HasRedirect)
+		return "200";
+
 	// Check if directory listing is off and we're trying to access via directory
 	LocationDir* dir = getDirectory(server, uri);
 	if(dir) {
