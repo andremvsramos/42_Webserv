@@ -32,19 +32,19 @@ Throughout the project, we followed a simple Agile approach to our workflow, whe
 
 ## Requirements and Configuration
 
-Before running this project, ensure proper folder management and the presence of basic HTML default files, aswell that your machine has php-cgi and python3 installed. For detailed instructions, please refer to the ConfigReadme.md file.
+Before running this project, ensure proper folder management and the presence of basic HTML default files, as well as that your machine has php-cgi and python3 installed. For detailed instructions, please refer to the ConfigReadme.md file.
 
 Please note that this setup is necessary as the server is designed to function locally on any machine for any user. Therefore, it's not intended to be a "free-for-all" configuration in terms of default directories and pages. This approach ensures correct behavior, considering the vast array of machine configurations.
 
 ### Configuration File
 
-Webserv's configuration draws inspiration from NGINX. However, it features its own syntax and capabilities. Please refer to the ConfigReadme.md file for detailed information on how to configure Webserv. Additionally, we've included a couple of configuration files as reference.
+Webserv's configuration draws inspiration from NGINX. However, it features its syntax and capabilities. Please refer to the ConfigReadme.md file for detailed information on how to configure Webserv. Additionally, we've included a couple of configuration files as references.
 
 ### Execution and Usage
 
 After correctly setting up the configuration files, directories, and default pages, simply run `make`. In our Makefile, we use a Dockerhub repository to fetch our default settings. If you encounter errors, remove the rule responsible for this in the Makefile.
 
-We've included a `run` rule in the Makefile. When invoked (`make run`), it executes the program. We included this feature because on most machines, binding ports below 1024 requires elevated privileges. However, we advise against using `sudo` for this purpose as a warning will be shown.
+We've included a `run` rule in the Makefile. When invoked (`make run`), it executes the program. We included this feature because, on most machines, binding ports below 1024 require elevated privileges. However, we advise against using `sudo` for this purpose as a warning will be shown.
 
 Once compiled successfully, execute the program with:
 
@@ -92,7 +92,7 @@ Chunked Transfer Encoding is a mechanism used in HTTP to send data as a series o
 
 In HTTP, chunked transfer encoding allows a request to be sent in chunks, primarily when the `Content-Length` header is not present or when the `Transfer-Encoding` header with the value `chunked` is included. The request body is divided into smaller "chunks," each prefixed by its size in hexadecimal format, followed by a carriage return and line feed (CRLF) pair, the chunk data, and another CRLF pair. The final chunk has a size of `0`, indicating the end of the request body. This mechanism enables sending requests with dynamic or streaming content without requiring the total size of the data to be known in advance.
 
-In a response, the use of chunked transfer encoding is indicated by the presence of the `Transfer-Encoding: chunked` header. Each chunk consists of the following components:
+In response, the use of chunked transfer encoding is indicated by the presence of the `Transfer-Encoding: chunked` header. Each chunk consists of the following components:
 
 1. **Chunk Size:** The size of the chunk in hexadecimal followed by a CRLF (Carriage Return + Line Feed).
 2. **Chunk Data:** The actual chunk data.
@@ -152,7 +152,7 @@ It's worth noting that while chunked responses are relatively common, chunked re
 
 ##### Project Application
 
-For this project, we extensively discussed Chunked Transfer Encoding (CTE). There was debate about its availability in base NGINX, which HTTP version supports it, and in what form. Multiple sources claim that CTE is available in HTTP/1.1, but only for chunked responses (which we don't generate in our project), while others imply it's available for both responses and requests. Some references suggest that although HTTP/1.1 allows it, base NGINX doesn't and requires additional modules to be installed.  Or you can disable CTE handling directly on a NGINX configuration file. Additionally, some results indicate that when HTTP/1.1 receives a chunked request, it forwards it to HTTP/1.0 to handle unexpected behavior.
+For this project, we extensively discussed Chunked Transfer Encoding (CTE). There was debate about its availability in base NGINX, which HTTP version supports it, and in what form. Multiple sources claim that CTE is available in HTTP/1.1, but only for chunked responses (which we don't generate in our project), while others imply it's available for both responses and requests. Some references suggest that although HTTP/1.1 allows it, base NGINX doesn't and requires additional modules to be installed.  Or you can disable CTE handling directly on an NGINX configuration file. Additionally, some results indicate that when HTTP/1.1 receives a chunked request, it forwards it to HTTP/1.0 to handle unexpected behavior.
 
 To meet a requirement of the project, which mandates that chunked requests be unchunked and decoded, we've provided a Python script (`chunker.py`) to generate chunked requests. We couldn't find a way to generate them locally using a browser, hence the need for the script. We've implemented a simple handler that, upon receiving a chunked request, waits until the full request is received, decodes the hexadecimal values, and sends a simple `200 OK` response to the script. This is a hardcoded example serving as a proof of concept since we rarely encounter chunked requests in normal scenarios.
 
