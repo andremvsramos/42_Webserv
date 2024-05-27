@@ -513,8 +513,25 @@ void Server::executeDeleteCGIScript(const std::string& scriptPath, Request& req,
         std::cerr << RED << "[Failed to fork]" << RESET << std::endl;
     } else if (pid > 0) {
         // Parent process
-        int status;
-        waitpid(pid, &status, 0);  // Wait for the child process to finish
+        const int timeoutSeconds = 5;
+        time_t startTime = time(NULL);
+
+		int status;
+		while (1) {
+			pid_t result = waitpid(pid, &status, WNOHANG);
+			if (result == -1)
+				break;
+			else if (result == 0) {
+				time_t currentTime = time(NULL);
+				if (difftime(currentTime, startTime) >= timeoutSeconds) {
+					std::cerr << RED << "[CGI Taking too long -> exiting]" << RESET << std::endl;
+					kill(pid, SIGKILL);
+					waitpid(pid, &status, 0);
+					break;
+				}
+			}
+			usleep(100000);
+		}  // Wait for the child process to finish
         if (WIFEXITED(status) ) {
 			resp.sendResponse(this, fd, "./var/www/html/form/delete.html", 202);
 			return;
@@ -595,14 +612,34 @@ void Server::executeUploadCGIScript(const std::string& scriptPath, Request& req,
 		close(toChild[0]); // Close the read end of the input pipe
 		close(toParent[1]); // Close the write end of the output pipe
 
+		fcntl(toChild[1], F_SETFL, O_NONBLOCK);
+
 		// Write POST data to the CGI script (Assuming binary data)
 		const std::string& postData = req.getReqbody(); // Check if getReqBody() actually retrieves raw binary data correctly
 		write(toChild[1], postData.data(), postData.size());
 		close(toChild[1]); // Close the write end to signal EOF to the child
 
+		const int timeoutSeconds = 5;
+        time_t startTime = time(NULL);
+
+		int status;
 		int reqCode;
-		// Parent waits for the child process to terminate
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &status, WNOHANG);
+		while (1) {
+			pid_t result = waitpid(pid, &status, WNOHANG);
+			if (result == -1)
+				break ;
+			else if (result == 0) {
+				time_t currentTime = time(NULL);
+				if (difftime(currentTime, startTime) >= timeoutSeconds) {
+					std::cerr << RED << "[CGI Taking too long -> exiting]" << RESET << std::endl;
+					kill(pid, SIGKILL);
+					waitpid(pid, &status, 0);
+					break;
+				}
+			}
+			usleep(100000);
+		}
 
 		if (req.getReqFilename().empty())
 			// Empty Media
@@ -704,14 +741,34 @@ void	Server::executeCGIScript(const std::string& scriptPath, Request& req, int f
 		close(toChild[0]); // Close the read end of the input pipe
 		close(toParent[1]); // Close the write end of the output pipe
 
+		fcntl(toChild[1], F_SETFL, O_NONBLOCK);
+
 		// Write POST data to the CGI script (Assuming binary data)
 		const std::string& postData = req.getReqbody(); // Check if getReqBody() actually retrieves raw binary data correctly
 		write(toChild[1], postData.data(), postData.size());
 		close(toChild[1]); // Close the write end to signal EOF to the child
+		
+		const int timeoutSeconds = 5;
+        time_t startTime = time(NULL);
 
+		int status;
+		while (1) {
+			pid_t result = waitpid(pid, &status, WNOHANG);
+			if (result == -1)
+				break ;
+			else if (result == 0) {
+				time_t currentTime = time(NULL);
+				if (difftime(currentTime, startTime) >= timeoutSeconds) {
+					std::cerr << RED << "[CGI Taking too long -> exiting]" << RESET << std::endl;
+					kill(pid, SIGKILL);
+					waitpid(pid, &status, 0);
+					break;
+				}
+			}
+			usleep(100000);
+		}
 
 		// Parent waits for the child process to terminate
-		waitpid(pid, NULL, 0);
 		resp.sendResponseCGI(toParent[0], toParent[1], fd);
 	}
 }
@@ -819,6 +876,10 @@ int	Server::sender(int socket) {
 			return 0;
 		}
 		uri = req.getReqUri();
+		if (reqCode == 405 || reqCode == 403) {
+			resp.sendResponse(this, fd, resp.getErrorPage(reqCode, _svConf), reqCode);
+			return 0;
+		}
 		int cgi = testCGI(uri, fd, req, resp, reqCode);
 		if (_isCGI == true) {
 			_isCGI = false;

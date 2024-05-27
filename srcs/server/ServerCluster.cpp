@@ -366,12 +366,10 @@ void	ServerCluster::StartServers() {
 				int client_socket = event_buffer[i].data.fd;
 				if(event_buffer[i].events & EPOLLERR) {
 					std::cerr << RED << "[EPOLLERR EVENT FD " << client_socket << "]" << RESET << std::endl;
-					close(event_buffer[i].data.fd);
 					continue;
 				}
 				else if(event_buffer[i].events & EPOLLHUP) {
 					std::cerr << RED << "[EPOLLHUP EVENT FD " << client_socket << "]" << RESET << std::endl;
-					close(event_buffer[i].data.fd);
 					continue;
 				}
 				else if (std::find(_serverSockets.begin(), _serverSockets.end(), client_socket) != _serverSockets.end()) {
