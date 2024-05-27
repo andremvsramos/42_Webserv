@@ -197,7 +197,7 @@ Clients may initiate additional requests, repeating this cycle as necessary.
 
 To create a valid HTTP request, the following elements are essential:
 
-- **URL:** Represents the unique name pointing to a specific resource on the server.
+- **URI:** Represents the unique name pointing to a specific resource on the server.
 - **HTTP Method:** Indicates the action the client desires the server to take, such as `GET`, `POST`, or `DELETE`.
 - **Headers:** Provide context and additional instructions to the server from the client.
 - **Body (optional):** Contains data sent from the client to the server as part of the request.
