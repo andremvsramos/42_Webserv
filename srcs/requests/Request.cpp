@@ -415,7 +415,7 @@ bool Request::validateRequestMethod(Server* server) {
 					currentURI = "root";
 			}
 
-			// If it's root do the same thing
+			/* // If it's root do the same thing
 			if (currentURI == "root" || _uri == "/") {
 				if ((_method == "GET" && server->isGETAllowed()) ||
 					(_method == "POST" && server->isPOSTAllowed()) ||
@@ -424,7 +424,7 @@ bool Request::validateRequestMethod(Server* server) {
 				}
 				else
 					return false;
-			}
+			} */
 		} catch(std::bad_cast &e) {
 			std::cout << "Failed Casting on Request::validateRequestMethod" << std::endl;
 		}
